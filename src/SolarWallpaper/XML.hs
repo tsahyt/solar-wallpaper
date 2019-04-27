@@ -51,4 +51,5 @@ transitionType :: TransitionType -> String
 transitionType Overlay = "overlay"
 
 xmlImageBlocks :: ZonedTime -> [ImageBlock] -> ByteString
-xmlImageBlocks t blks = pack . ppTopElement $ unode "background" (startTime t : map imageBlock blks)
+xmlImageBlocks t blks =
+    pack . ppTopElement $ unode "background" (startTime t : map imageBlock blks)

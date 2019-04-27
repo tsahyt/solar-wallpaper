@@ -9,11 +9,11 @@ module SolarWallpaper.Types (
 import Data.Time (NominalDiffTime)
 
 data Images = Images
-    { imgSunrise :: FilePath
-    , imgNoon :: FilePath
-    , imgSunset :: FilePath
-    , imgEvening :: FilePath
-    , imgMidnight :: FilePath
+    { imgSunrise :: !FilePath
+    , imgNoon :: !FilePath
+    , imgSunset :: !FilePath
+    , imgEvening :: !FilePath
+    , imgMidnight :: !FilePath
     } deriving (Show, Eq, Ord, Read)
 
 data TransitionType =

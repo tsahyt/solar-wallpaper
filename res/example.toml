@@ -1,0 +1,12 @@
+out.path = "/tmp/example.xml"
+
+[img]
+sunrise = "sunrise-path"
+noon = "noon-path"
+sunset = "sunset-path"
+evening = "evening-path"
+midnight = "midnight-path"
+
+[loc]
+latitude = 50.0
+longitude = 25.0

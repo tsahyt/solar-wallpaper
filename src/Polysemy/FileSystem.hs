@@ -3,6 +3,9 @@
 module Polysemy.FileSystem
     ( FileSystem(..)
     , writeFile
+    , appendFile
+    , readFile
+    , doesFileExist
     , runFileSystemIO
     , outputToFile
     ) where
@@ -11,12 +14,15 @@ import Data.ByteString (ByteString)
 import Polysemy
 import Polysemy.Output
 
-import Prelude hiding (writeFile, appendFile)
+import Prelude hiding (writeFile, appendFile, readFile)
 import qualified Data.ByteString as BS
+import qualified System.Directory as D
 
 data FileSystem m a where
     WriteFile :: FilePath -> ByteString -> FileSystem m ()
     AppendFile :: FilePath -> ByteString -> FileSystem m ()
+    ReadFile :: FilePath -> FileSystem m ByteString
+    DoesFileExist :: FilePath -> FileSystem m Bool
 
 makeSem ''FileSystem
 
@@ -37,3 +43,5 @@ runFileSystemIO =
     interpret $ \case
         WriteFile path dat -> sendM $ BS.writeFile path dat
         AppendFile path dat -> sendM $ BS.appendFile path dat
+        ReadFile path -> sendM $ BS.readFile path
+        DoesFileExist path -> sendM $ D.doesFileExist path
