@@ -1,0 +1,11 @@
+# Example .timer file for solar-wallpaper. Adjust the [Timer] section to tweak
+# when the application runs.
+[Unit]
+Description=Run solar-wallpaper once a week
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target

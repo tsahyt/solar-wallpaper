@@ -1,0 +1,12 @@
+# Example .service file for solar-wallpaper. Adjust the ExecStart line below to
+# point to your input file.
+[Unit]
+Description=Generate Wallpaper
+
+[Service]
+Environment="DISPLAY=:0"
+ExecStart=/home/user/.local/bin/solar-wallpaper generate -i inputfile.toml -a
+Type=oneshot
+
+[Install]
+WantedBy=default.target
