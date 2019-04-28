@@ -4,5 +4,3 @@ packages:
 extra-deps:
 - solar-0.1.0.0
 - polysemy-0.1.2.0
-- time-1.9.2
-allow-newer: true

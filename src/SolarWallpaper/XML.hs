@@ -16,9 +16,10 @@ import Text.XML.Light
 import Text.Printf
 
 showDuration :: NominalDiffTime -> String
-showDuration =
-    printf "%.1f" .
-    (id :: Double -> Double) . realToFrac . nominalDiffTimeToSeconds
+showDuration t =
+        let it = truncate t :: Integer
+            dt = fromIntegral it :: Double
+         in printf "%.1f" dt
 
 showDoubleDigit :: (PrintfArg a, Integral a) => a -> String
 showDoubleDigit = printf "%0.2d"

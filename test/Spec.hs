@@ -5,7 +5,6 @@ module Main (
     main
 ) where
 
-import Data.ByteString (ByteString)
 import Test.Hspec
 import Data.Monoid
 import SolarWallpaper

@@ -68,6 +68,7 @@ readConfig path = do
 
 data CLI = CLI
     { configPath :: FilePath <?> "Path to configuration file"
+    , setWallpaper :: Bool <?> "Set Wallpaper after writing"
     }
     deriving (Generic)
 

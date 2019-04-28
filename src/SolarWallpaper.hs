@@ -3,6 +3,8 @@
 module SolarWallpaper
     ( main'
     , imageSequence
+    -- * Time Utility Functions
+    , diffLocalTime
     ) where
 
 import Data.Time.Solar
@@ -16,7 +18,13 @@ import qualified Data.Time as T
 
 add24h :: ZonedTime -> ZonedTime
 add24h t =
-    ZonedTime (T.addLocalTime 86400 $ zonedTimeToLocalTime t) (zonedTimeZone t)
+    ZonedTime (addLocalTime 86400 $ zonedTimeToLocalTime t) (zonedTimeZone t)
+
+addLocalTime :: T.NominalDiffTime -> T.LocalTime -> T.LocalTime
+addLocalTime x = T.utcToLocalTime T.utc . T.addUTCTime x . T.localTimeToUTC T.utc
+
+diffLocalTime :: T.LocalTime -> T.LocalTime -> T.NominalDiffTime
+diffLocalTime a b = T.diffUTCTime (T.localTimeToUTC T.utc a) (T.localTimeToUTC T.utc b)
 
 imageSequence :: Images -> ZonedTime -> Location -> (ZonedTime, [ImageBlock])
 imageSequence imgs now here =
@@ -27,7 +35,7 @@ imageSequence imgs now here =
                   Overlay
                   (imgSunrise imgs)
                   (imgNoon imgs)
-                  (T.zonedTimeToLocalTime (solarNoon now here) `T.diffLocalTime`
+                  (T.zonedTimeToLocalTime (solarNoon now here) `diffLocalTime`
                    T.zonedTimeToLocalTime (sunrise now here) -
                    7200)
             , StaticImage (imgNoon imgs) 7200
@@ -35,7 +43,7 @@ imageSequence imgs now here =
                   Overlay
                   (imgNoon imgs)
                   (imgSunset imgs)
-                  (T.zonedTimeToLocalTime (sunset now here) `T.diffLocalTime`
+                  (T.zonedTimeToLocalTime (sunset now here) `diffLocalTime`
                    T.zonedTimeToLocalTime (solarNoon now here) -
                    7200)
             , StaticImage (imgSunset imgs) 3600
@@ -43,7 +51,7 @@ imageSequence imgs now here =
                   Overlay
                   (imgSunset imgs)
                   (imgEvening imgs)
-                  ((T.zonedTimeToLocalTime (solarMidnight now here) `T.diffLocalTime`
+                  ((T.zonedTimeToLocalTime (solarMidnight now here) `diffLocalTime`
                     T.zonedTimeToLocalTime (sunset now here) -
                     3600) /
                    2)
@@ -52,7 +60,7 @@ imageSequence imgs now here =
                   Overlay
                   (imgEvening imgs)
                   (imgMidnight imgs)
-                  ((T.zonedTimeToLocalTime (solarMidnight now here) `T.diffLocalTime`
+                  ((T.zonedTimeToLocalTime (solarMidnight now here) `diffLocalTime`
                     T.zonedTimeToLocalTime (sunset now here) -
                     3600) /
                    2)
@@ -61,7 +69,7 @@ imageSequence imgs now here =
                   Overlay
                   (imgMidnight imgs)
                   (imgSunrise imgs)
-                  ((T.zonedTimeToLocalTime (add24h $ sunrise now here) `T.diffLocalTime`
+                  ((T.zonedTimeToLocalTime (add24h $ sunrise now here) `diffLocalTime`
                     T.zonedTimeToLocalTime (solarMidnight now here) -
                     7200))
             ]

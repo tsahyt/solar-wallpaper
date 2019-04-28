@@ -1,5 +1,6 @@
 module Main where
 
+import Control.Monad
 import Polysemy
 import Polysemy.Time
 import Polysemy.Input
@@ -22,13 +23,13 @@ runMain ::
     => Sem r ()
 runMain = do
     res <- runError @String $ do
-        conf <- do
-            cli <- input
-            readConfig (unHelpful $ configPath cli)
+        cli <- input
+        conf <- readConfig (unHelpful $ configPath cli)
         runConstInput @Images (configImages conf) . 
             runConstInput @Location (configLocation conf) .
             outputToFile (configOutput conf) (uncurry xmlImageBlocks)
                 $ main'
+        when (unHelpful $ setWallpaper cli) $ pure ()
     case res of
         Left e -> putError e
         Right () -> pure ()
