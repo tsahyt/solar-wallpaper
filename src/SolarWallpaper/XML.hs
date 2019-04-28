@@ -9,17 +9,17 @@ module SolarWallpaper.XML
 
 import Data.ByteString.Char8 (ByteString, pack)
 import Data.Time.Calendar
-import Data.Time.LocalTime
 import Data.Time.Clock
+import Data.Time.LocalTime
 import SolarWallpaper.Types
-import Text.XML.Light
 import Text.Printf
+import Text.XML.Light
 
 showDuration :: NominalDiffTime -> String
 showDuration t =
-        let it = truncate t :: Integer
-            dt = fromIntegral it :: Double
-         in printf "%.1f" dt
+    let it = truncate t :: Integer
+        dt = fromIntegral it :: Double
+     in printf "%.1f" dt
 
 showDoubleDigit :: (PrintfArg a, Integral a) => a -> String
 showDoubleDigit = printf "%0.2d"

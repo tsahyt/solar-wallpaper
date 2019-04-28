@@ -66,10 +66,10 @@ readConfig path = do
                 Left e -> throw (unpack $ Toml.prettyException e)
                 Right x -> pure x
 
-data CLI = CLI
-    { configPath :: FilePath <?> "Path to configuration file"
-    , apply :: Bool <?> "Apply Wallpaper after writing"
-    }
+data CLI
+    = Generate { inputPath :: FilePath <?> "Path to input file"
+               , apply :: Bool <?> "Apply Wallpaper after writing" }
+    | Times { inputPath :: FilePath <?> "Path to input file" }
     deriving (Generic)
 
 instance ParseRecord CLI where
@@ -79,10 +79,11 @@ instance ParseRecord CLI where
 
 runInputFromCLI ::
        forall i r a. (ParseRecord i, Member (Lift IO) r)
-    => Sem (Input i ': r) a
+    => Text
+    -> Sem (Input i ': r) a
     -> Sem r a
-runInputFromCLI sem = do
-    i <- sendM (getRecord "Solar Wallpaper Generator for GNOME" :: IO i)
+runInputFromCLI desc sem = do
+    i <- sendM (getRecord desc :: IO i)
     interpret
         (\case
              Input -> pure i)

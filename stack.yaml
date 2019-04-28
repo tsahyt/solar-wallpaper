@@ -4,3 +4,4 @@ packages:
 extra-deps:
 - solar-0.1.0.0
 - polysemy-0.1.2.0
+- wl-pprint-1.2.1
