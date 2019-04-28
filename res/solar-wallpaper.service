@@ -1,5 +1,6 @@
 # Example .service file for solar-wallpaper. Adjust the ExecStart line below to
-# point to your input file.
+# point to your input file. Be sure to also change the path to the executable
+# to where your installation resides!
 [Unit]
 Description=Generate Wallpaper
 
