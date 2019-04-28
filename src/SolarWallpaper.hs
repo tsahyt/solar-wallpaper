@@ -20,9 +20,11 @@ add24h :: ZonedTime -> ZonedTime
 add24h t =
     ZonedTime (addLocalTime 86400 $ zonedTimeToLocalTime t) (zonedTimeZone t)
 
+-- | Lifted from time-1.9
 addLocalTime :: T.NominalDiffTime -> T.LocalTime -> T.LocalTime
 addLocalTime x = T.utcToLocalTime T.utc . T.addUTCTime x . T.localTimeToUTC T.utc
 
+-- | Lifted from time-1.9
 diffLocalTime :: T.LocalTime -> T.LocalTime -> T.NominalDiffTime
 diffLocalTime a b = T.diffUTCTime (T.localTimeToUTC T.utc a) (T.localTimeToUTC T.utc b)
 
