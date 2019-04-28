@@ -6,7 +6,7 @@ import Polysemy.Time
 import Polysemy.Input
 import Polysemy.Error
 import Polysemy.FileSystem
-import Polysemy.Teletype
+import Polysemy.Trace
 import Polysemy.Wallpaper
 import Data.Time.Solar
 import SolarWallpaper
@@ -15,16 +15,23 @@ import SolarWallpaper.XML
 import SolarWallpaper.Config
 import Options.Generic (unHelpful)
 
+runErrorTrace :: (Member Trace r) => Sem (Error String ': r) () -> Sem r ()
+runErrorTrace sem = do
+    x <- runError sem
+    case x of
+        Left e -> trace $ "ERROR: " <> e
+        Right () -> pure ()
+
 runMain ::
        ( Member Time r
        , Member FileSystem r
-       , Member Teletype r
+       , Member Trace r
        , Member Wallpaper r
        , Member (Input CLI) r
        )
     => Sem r ()
-runMain = do
-    res <- runError @String $ do
+runMain =
+    runErrorTrace $ do
         cli <- input
         conf <- readConfig (unHelpful $ configPath cli)
         runConstInput @Images (configImages conf) . 
@@ -33,16 +40,13 @@ runMain = do
                 $ main'
         when (unHelpful $ apply cli) $ 
             setWallpaper (configOutput conf)
-    case res of
-        Left e -> putError e
-        Right () -> pure ()
 
 main :: IO ()
 main =
     runM .
     runInputFromCLI @CLI .
     runFileSystemIO .
-    runTeletypeIO .
     runWallpaperIO .
+    runTraceIO .
     runTimeIO $
     runMain

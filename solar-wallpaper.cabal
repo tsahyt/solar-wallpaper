@@ -21,7 +21,6 @@ library
                        SolarWallpaper.Config
                        Polysemy.Time
                        Polysemy.FileSystem
-                       Polysemy.Teletype
                        Polysemy.Wallpaper
   default-language:    Haskell2010
   ghc-options:         -O2 -flate-specialise -fspecialise-aggressively -Wall
