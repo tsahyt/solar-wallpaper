@@ -5,6 +5,7 @@ module Polysemy.Wallpaper
     ( Wallpaper(..)
     , setWallpaper
     , runWallpaperIO
+    , runWallpaperIgnore
     ) where
 
 import Polysemy
@@ -34,3 +35,8 @@ runWallpaperIO sem = do
                      "picture-uri"
                      ("file://" <> pack path))
         sem
+
+runWallpaperIgnore :: Sem (Wallpaper ': r) a -> Sem r a
+runWallpaperIgnore =
+    interpret $ \case
+        SetWallpaper _ -> pure ()
