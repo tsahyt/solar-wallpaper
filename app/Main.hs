@@ -7,6 +7,7 @@ import Polysemy.Input
 import Polysemy.Error
 import Polysemy.FileSystem
 import Polysemy.Teletype
+import Polysemy.Wallpaper
 import Data.Time.Solar
 import SolarWallpaper
 import SolarWallpaper.Types
@@ -18,6 +19,7 @@ runMain ::
        ( Member Time r
        , Member FileSystem r
        , Member Teletype r
+       , Member Wallpaper r
        , Member (Input CLI) r
        )
     => Sem r ()
@@ -29,7 +31,8 @@ runMain = do
             runConstInput @Location (configLocation conf) .
             outputToFile (configOutput conf) (uncurry xmlImageBlocks)
                 $ main'
-        when (unHelpful $ setWallpaper cli) $ pure ()
+        when (unHelpful $ apply cli) $ 
+            setWallpaper (configOutput conf)
     case res of
         Left e -> putError e
         Right () -> pure ()
@@ -40,5 +43,6 @@ main =
     runInputFromCLI @CLI .
     runFileSystemIO .
     runTeletypeIO .
+    runWallpaperIO .
     runTimeIO $
     runMain
