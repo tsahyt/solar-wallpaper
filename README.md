@@ -9,7 +9,7 @@ position at your location.
 generated. Below you find an example. The field names are self-explanatory. A
 stub file can be found in `res/example.toml`.
 
-```
+```toml
 out.path = "/tmp/example.xml"
 
 [img]
