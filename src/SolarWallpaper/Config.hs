@@ -67,7 +67,11 @@ readInputFile path = do
             raw <- decodeUtf8 <$> readFile path
             case Toml.decode tomlConfig raw of
                 Left e -> throw (unpack $ Toml.prettyException e)
-                Right x -> pure x
+                Right x ->
+                    SolarInput <$> pure (solarLocation x) <*>
+                    absolutifyImages path (solarImages x) <*>
+                    pure (solarOutput x) <*>
+                    pure (solarBias x)
 
 data CLI
     = Generate { inputPath :: FilePath <?> "Path to input file"

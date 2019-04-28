@@ -8,6 +8,8 @@ module Polysemy.FileSystem
     , doesFileExist
     , runFileSystemIO
     , outputToFile
+    , changeDir
+    , makeAbsolute
     ) where
 
 import Data.ByteString (ByteString)
@@ -23,6 +25,8 @@ data FileSystem m a where
     AppendFile :: FilePath -> ByteString -> FileSystem m ()
     ReadFile :: FilePath -> FileSystem m ByteString
     DoesFileExist :: FilePath -> FileSystem m Bool
+    ChangeDir :: FilePath -> FileSystem m ()
+    MakeAbsolute :: FilePath -> FileSystem m FilePath
 
 makeSem ''FileSystem
 
@@ -45,3 +49,5 @@ runFileSystemIO =
         AppendFile path dat -> sendM $ BS.appendFile path dat
         ReadFile path -> sendM $ BS.readFile path
         DoesFileExist path -> sendM $ D.doesFileExist path
+        ChangeDir dir -> sendM $ D.setCurrentDirectory dir
+        MakeAbsolute path -> sendM $ D.makeAbsolute path

@@ -24,6 +24,7 @@ latitude = 50.0
 longitude = 25.0
 ```
 
+Paths can be relative, and will be considered *relative to the input file*.
 Given this example file, you can run the generator using
 ```
 solar-wallpaper generate -i path/to/file.toml

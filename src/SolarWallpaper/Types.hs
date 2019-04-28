@@ -1,5 +1,6 @@
 module SolarWallpaper.Types (
     Images(..),
+    absolutifyImages,
     TransitionType(..),
     ImageBlock(..),
     blockTime,
@@ -9,6 +10,9 @@ module SolarWallpaper.Types (
     addZonedTime
 ) where
 
+import Polysemy
+import Polysemy.FileSystem
+import System.FilePath (takeDirectory)
 import Data.Time (NominalDiffTime)
 import qualified Data.Time as T
 
@@ -19,6 +23,15 @@ data Images = Images
     , imgEvening :: !FilePath
     , imgMidnight :: !FilePath
     } deriving (Show, Eq, Ord, Read)
+
+absolutifyImages :: Member FileSystem r => FilePath -> Images -> Sem r Images
+absolutifyImages inpPath images =
+    changeDir (takeDirectory inpPath) *>
+    (Images <$> makeAbsolute (imgSunrise images) <*>
+     makeAbsolute (imgNoon images) <*>
+     makeAbsolute (imgSunset images) <*>
+     makeAbsolute (imgEvening images) <*>
+     makeAbsolute (imgMidnight images))
 
 data TransitionType =
     Overlay
