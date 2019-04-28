@@ -8,7 +8,9 @@ module Polysemy.Time
     , utcToLocalZoned
     -- * Interpreters
     , runTimeIO
-    , runTimeFixed
+    , runTimeFixedT
+    , runTimeFixedZ
+    , runTimePure
     ) where
 
 import qualified Data.Time as T
@@ -32,11 +34,28 @@ utcToLocalZoned t = do
     pure $ T.utcToZonedTime zone t
 
 runTimeIO :: Member (Lift IO) r => Sem (Time ': r) a -> Sem r a
-runTimeIO = interpret $ \case
-    GetCurrentTime -> sendM T.getCurrentTime
-    GetCurrentTimeZone -> sendM T.getCurrentTimeZone
+runTimeIO =
+    interpret $ \case
+        GetCurrentTime -> sendM T.getCurrentTime
+        GetCurrentTimeZone -> sendM T.getCurrentTimeZone
 
-runTimeFixed :: T.UTCTime -> T.TimeZone -> Sem (Time ': r) a -> Sem r a
-runTimeFixed t zone = interpret $ \case
-    GetCurrentTime -> pure t
-    GetCurrentTimeZone -> pure zone
+-- | Interpret a 'Time' effect at a fixed time, but with the local timezone.
+runTimeFixedT :: Member (Lift IO) r => T.UTCTime -> Sem (Time ': r) a -> Sem r a
+runTimeFixedT t =
+    interpret $ \case
+        GetCurrentTime -> pure t
+        GetCurrentTimeZone -> sendM T.getCurrentTimeZone
+
+-- | Interpret a 'Time' effect at a fixed time, but with the local timezone.
+runTimeFixedZ ::
+       Member (Lift IO) r => T.TimeZone -> Sem (Time ': r) a -> Sem r a
+runTimeFixedZ zone =
+    interpret $ \case
+        GetCurrentTime -> sendM T.getCurrentTime
+        GetCurrentTimeZone -> pure zone
+
+runTimePure :: T.UTCTime -> T.TimeZone -> Sem (Time ': r) a -> Sem r a
+runTimePure t zone =
+    interpret $ \case
+        GetCurrentTime -> pure t
+        GetCurrentTimeZone -> pure zone

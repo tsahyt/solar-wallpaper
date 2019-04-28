@@ -15,6 +15,7 @@ import Polysemy.Error
 import Polysemy.Input
 import SolarWallpaper.Types
 import GHC.Generics
+import Data.Time (Day)
 import Data.Time.Solar (Location(..))
 import Data.Text (unpack)
 import Data.Text.Encoding (decodeUtf8)
@@ -68,8 +69,12 @@ readConfig path = do
 
 data CLI
     = Generate { inputPath :: FilePath <?> "Path to input file"
-               , apply :: Bool <?> "Apply Wallpaper after writing" }
-    | Times { inputPath :: FilePath <?> "Path to input file" }
+               , apply :: Bool <?> "Apply Wallpaper after writing"
+               , day :: Maybe Day <?> "Day to use instead of current date"
+               , zone :: Maybe Int <?> "Timezone to use instead of local" }
+    | Times { inputPath :: FilePath <?> "Path to input file"
+            , day :: Maybe Day <?> "Day to use instead of current date"
+            , zone :: Maybe Int <?> "Timezone to use instead of local" }
     deriving (Generic)
 
 instance ParseRecord CLI where
