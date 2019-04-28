@@ -33,13 +33,17 @@ main =
                 ZonedTime (LocalTime (fromGregorian 2019 03 03) midday) utc
             start = sunrise now loc
         describe "imageSequence" $ do
-            let blks = imageSequence imgs now loc
+            let blks = imageSequence imgs now loc Nothing
+                blksB = imageSequence imgs now loc (Just 0.2)
             it "starts at sunrise" $
                 zonedTimeToLocalTime (fst blks) `shouldBe`
                 zonedTimeToLocalTime start
-            it "sums up to 24h" $ do
+            it "sums up to 24h with bias 0.5" $ do
                 let blockSum = getSum . foldMap (Sum . blockTime)
                 (blockSum . snd $ blks) `shouldBe` 86400
+            it "sums up to 24h with bias 0.2" $ do
+                let blockSum = getSum . foldMap (Sum . blockTime)
+                (blockSum . snd $ blksB) `shouldBe` 86400
             it "displays sunrise image at sunrise" $
                 blockAt (sunrise now loc) start (snd blks) `shouldBe` "sunrise"
             it "displays noon image at noon" $

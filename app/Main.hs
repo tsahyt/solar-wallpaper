@@ -2,7 +2,6 @@
 module Main where
 
 import Control.Monad
-import Data.Time.Solar
 import Data.Time (UTCTime (..), hoursToTimeZone)
 import Options.Generic (unHelpful)
 import Polysemy
@@ -15,7 +14,6 @@ import Polysemy.Wallpaper
 import Polysemy.Output
 import SolarWallpaper
 import SolarWallpaper.Config
-import SolarWallpaper.Types
 import SolarWallpaper.XML
 import SolarWallpaper.Pretty
 
@@ -58,15 +56,14 @@ runMain ::
 runMain =
     runErrorTrace $ do
         cli <- input
-        conf <- readConfig (unHelpful $ inputPath cli)
-        runConstInput @Images (configImages conf) .
-            runConstInput @Location (configLocation conf) $
+        inp <- readInputFile (unHelpful $ inputPath cli)
+        runConstInput inp $
             case cli of
                 Generate {} -> do
-                    outputToFile (configOutput conf) (uncurry xmlImageBlocks) $
+                    outputToFile (solarOutput inp) (uncurry xmlImageBlocks) $
                         main'
                     when (unHelpful $ apply cli) $
-                        setWallpaper (configOutput conf)
+                        setWallpaper (solarOutput inp)
                 Times {} -> runOutputAsPrettyTrace (uncurry prettyOut) $ main'
 
 main :: IO ()

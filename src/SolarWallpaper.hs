@@ -8,11 +8,13 @@ module SolarWallpaper
     ) where
 
 import Data.Time.Solar
+import Data.Maybe (fromMaybe)
 import Polysemy
 import Polysemy.Input
 import Polysemy.Output
 import Polysemy.Time
 import SolarWallpaper.Types
+import SolarWallpaper.Config
 
 import qualified Data.Time as T
 
@@ -20,9 +22,10 @@ add24h :: ZonedTime -> ZonedTime
 add24h t =
     ZonedTime (addLocalTime 86400 $ zonedTimeToLocalTime t) (zonedTimeZone t)
 
-imageSequence :: Images -> ZonedTime -> Location -> (ZonedTime, [ImageBlock])
-imageSequence imgs now here =
+imageSequence :: Images -> ZonedTime -> Location -> Maybe Double -> (ZonedTime, [ImageBlock])
+imageSequence imgs now here bias =
     let startTime = sunrise now here
+        bias' = fromMaybe 0.5 bias
         blocks =
             [ StaticImage (imgSunrise imgs) 3600
             , Transition
@@ -47,8 +50,7 @@ imageSequence imgs now here =
                   (imgEvening imgs)
                   ((T.zonedTimeToLocalTime (solarMidnight now here) `diffLocalTime`
                     T.zonedTimeToLocalTime (sunset now here) -
-                    3600) /
-                   2)
+                    3600) * realToFrac bias')
             , StaticImage (imgEvening imgs) 3600
             , Transition
                   Overlay
@@ -56,8 +58,7 @@ imageSequence imgs now here =
                   (imgMidnight imgs)
                   ((T.zonedTimeToLocalTime (solarMidnight now here) `diffLocalTime`
                     T.zonedTimeToLocalTime (sunset now here) -
-                    3600) /
-                   2)
+                    3600) * realToFrac (1 - bias'))
             , StaticImage (imgMidnight imgs) 7200
             , Transition
                   Overlay
@@ -71,13 +72,11 @@ imageSequence imgs now here =
 
 main' ::
        ( Member Time r
-       , Member (Input Images) r
-       , Member (Input Location) r
+       , Member (Input SolarInput) r
        , Member (Output (ZonedTime, [ImageBlock])) r
        )
     => Sem r ()
 main' = do
     now <- getZonedTime
-    imgs <- input
-    here <- input
-    output $ imageSequence imgs now here
+    inp <- input
+    output $ imageSequence (solarImages inp) now (solarLocation inp) (solarBias inp)

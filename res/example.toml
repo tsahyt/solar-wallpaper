@@ -1,4 +1,5 @@
 out.path = "/tmp/example.xml"
+bias = 0.2
 
 [img]
 sunrise = "sunrise-path"

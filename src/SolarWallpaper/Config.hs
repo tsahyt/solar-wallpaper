@@ -3,8 +3,8 @@
 {-# LANGUAGE DeriveAnyClass #-}
 
 module SolarWallpaper.Config (
-    Config (..),
-    readConfig,
+    SolarInput (..),
+    readInputFile,
     runInputFromCLI,
     CLI (..)
 ) where
@@ -26,10 +26,11 @@ import Prelude hiding (readFile)
 import Toml (TomlCodec, (.=))
 import qualified Toml
 
-data Config = Config
-    { configLocation :: !Location 
-    , configImages :: !Images
-    , configOutput :: !FilePath }
+data SolarInput = SolarInput
+    { solarLocation :: !Location 
+    , solarImages :: !Images
+    , solarOutput :: !FilePath
+    , solarBias :: Maybe Double }
 
 tomlImages :: TomlCodec Images
 tomlImages =
@@ -46,18 +47,19 @@ tomlLocation =
         <$> Toml.double "latitude" .= latitude
         <*> Toml.double "longitude" .= longitude
 
-tomlConfig :: TomlCodec Config
+tomlConfig :: TomlCodec SolarInput
 tomlConfig =
-    Config 
-        <$> Toml.table tomlLocation "loc" .= configLocation 
-        <*> Toml.table tomlImages "img" .= configImages 
-        <*> Toml.string "out.path" .= configOutput
+    SolarInput
+        <$> Toml.table tomlLocation "loc" .= solarLocation 
+        <*> Toml.table tomlImages "img" .= solarImages 
+        <*> Toml.string "out.path" .= solarOutput
+        <*> Toml.dioptional (Toml.double "bias") .= solarBias
 
-readConfig ::
+readInputFile ::
        (Member FileSystem r, Member (Error String) r)
     => FilePath
-    -> Sem r Config
-readConfig path = do
+    -> Sem r SolarInput
+readInputFile path = do
     exists <- doesFileExist path
     if not exists
         then throw @String "Config file not found!"
