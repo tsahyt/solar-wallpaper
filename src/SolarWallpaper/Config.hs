@@ -82,7 +82,7 @@ runInputFromCLI ::
     => Sem (Input i ': r) a
     -> Sem r a
 runInputFromCLI sem = do
-    i <- sendM (getRecord "foo" :: IO i)
+    i <- sendM (getRecord "Solar Wallpaper Generator for GNOME" :: IO i)
     interpret
         (\case
              Input -> pure i)
