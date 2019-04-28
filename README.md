@@ -3,6 +3,14 @@
 A simple tool to generate wallpaper XML files for GNOME which respect solar
 position at your location.
 
+## Install
+
+You can build the application with `stack build` and install it with `stack
+install`. See the stack [documentation](https://haskellstack.org) for more
+details on how to use it. Using `stack install` will place it in
+`$HOME/.local/bin` as `solar-wallpaper-exe`. Make sure that this directory is
+in your path.
+
 ## Example
 
 `solar-wallpaper` works using an input file, which defines the wallpaper to be
