@@ -25,7 +25,12 @@ add24h :: ZonedTime -> ZonedTime
 add24h t =
     ZonedTime (addLocalTime 86400 $ zonedTimeToLocalTime t) (zonedTimeZone t)
 
-imageSequence :: Images -> ZonedTime -> Location -> Maybe Double -> (ZonedTime, [ImageBlock])
+imageSequence ::
+       Images
+    -> ZonedTime
+    -> Location
+    -> Maybe Double
+    -> (ZonedTime, [ImageBlock])
 imageSequence imgs now here bias =
     let startTime = sunrise now here
         bias' = fromMaybe 0.5 bias
@@ -71,12 +76,14 @@ imageSequence imgs now here bias =
             ]
      in (startTime, blocks)
 
-traceTimes :: (Member Trace r, Member Time r, Member (Input SolarInput) r) => Sem r ()
+traceTimes ::
+       (Member Trace r, Member Time r, Member (Input SolarInput) r) => Sem r ()
 traceTimes = do
     now <- getZonedTime
     inp <- input
     let loc = solarLocation inp
-    traverse_ trace
+    traverse_
+        trace
         [ "Sunrise: " <> show (sunrise now loc)
         , "Solar Noon: " <> show (solarNoon now loc)
         , "Sunset: " <> show (sunset now loc)
