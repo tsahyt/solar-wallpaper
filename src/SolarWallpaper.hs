@@ -3,15 +3,18 @@
 module SolarWallpaper
     ( main'
     , imageSequence
+    , traceTimes
     -- * Time Utility Functions
     , diffLocalTime
     ) where
 
 import Data.Time.Solar
 import Data.Maybe (fromMaybe)
+import Data.Foldable (traverse_)
 import Polysemy
 import Polysemy.Input
 import Polysemy.Output
+import Polysemy.Trace
 import Polysemy.Time
 import SolarWallpaper.Types
 import SolarWallpaper.Config
@@ -42,23 +45,21 @@ imageSequence imgs now here bias =
                   (imgSunset imgs)
                   (T.zonedTimeToLocalTime (sunset now here) `diffLocalTime`
                    T.zonedTimeToLocalTime (solarNoon now here) -
-                   7200)
+                   7200 - 3600)
             , StaticImage (imgSunset imgs) 3600
             , Transition
                   Overlay
                   (imgSunset imgs)
                   (imgEvening imgs)
                   ((T.zonedTimeToLocalTime (solarMidnight now here) `diffLocalTime`
-                    T.zonedTimeToLocalTime (sunset now here) -
-                    3600) * realToFrac bias')
+                    T.zonedTimeToLocalTime (sunset now here)) * realToFrac bias')
             , StaticImage (imgEvening imgs) 3600
             , Transition
                   Overlay
                   (imgEvening imgs)
                   (imgMidnight imgs)
                   ((T.zonedTimeToLocalTime (solarMidnight now here) `diffLocalTime`
-                    T.zonedTimeToLocalTime (sunset now here) -
-                    3600) * realToFrac (1 - bias'))
+                    T.zonedTimeToLocalTime (sunset now here)) * realToFrac (1 - bias'))
             , StaticImage (imgMidnight imgs) 7200
             , Transition
                   Overlay
@@ -69,6 +70,18 @@ imageSequence imgs now here bias =
                     7200))
             ]
      in (startTime, blocks)
+
+traceTimes :: (Member Trace r, Member Time r, Member (Input SolarInput) r) => Sem r ()
+traceTimes = do
+    now <- getZonedTime
+    inp <- input
+    let loc = solarLocation inp
+    traverse_ trace
+        [ "Sunrise: " <> show (sunrise now loc)
+        , "Solar Noon: " <> show (solarNoon now loc)
+        , "Sunset: " <> show (sunset now loc)
+        , "Solar Midnight: " <> show (solarMidnight now loc)
+        ]
 
 main' ::
        ( Member Time r

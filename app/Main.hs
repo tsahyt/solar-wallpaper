@@ -64,7 +64,9 @@ runMain =
                         main'
                     when (unHelpful $ apply cli) $
                         setWallpaper (solarOutput inp)
-                Times {} -> runOutputAsPrettyTrace (uncurry prettyOut) $ main'
+                Times {} -> do
+                    traceTimes
+                    runOutputAsPrettyTrace (uncurry prettyOut) $ main'
 
 main :: IO ()
 main =

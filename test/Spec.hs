@@ -19,7 +19,7 @@ blockAt at start =
     snd .
     head .
     dropWhile ((< dt) . fst) .
-    scanl1 (\(a, _) (c, d) -> (a + c, d)) .
+    scanl1 (\(a, b) (c, d) -> (a + c, d)) .
     map (\x -> (blockTime x, blockImage x))
   where
     dt = zonedTimeToLocalTime at `diffLocalTime` zonedTimeToLocalTime start
@@ -48,8 +48,8 @@ main =
                 blockAt (sunrise now loc) start (snd blks) `shouldBe` "sunrise"
             it "displays noon image at noon" $
                 blockAt (solarNoon now loc) start (snd blks) `shouldBe` "noon"
-            it "displays sunset image at sunset" $
-                blockAt (sunset now loc) start (snd blks) `shouldBe` "sunset"
+            it "transition to evening at sunset time" $
+                blockAt (sunset now loc) start (snd blks) `shouldBe` "evening"
             it "displays midnight image at midnight" $
                 blockAt (solarMidnight now loc) start (snd blks) `shouldBe`
                 "midnight"
